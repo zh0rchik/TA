@@ -1,0 +1,7 @@
+var i, N:
+    integer;
+
+begin
+    i := 1;
+    readln(N);
+end.
