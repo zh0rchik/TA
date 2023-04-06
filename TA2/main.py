@@ -42,14 +42,15 @@ if __name__ == "__main__":
     else:
         if kod == MULTIPLICATION:
             res = bin(int(op1, 2) * int(op2, 2))[2:]
-            print_state("S6", kod, op1, op2, res, err)
+
+            if len(res) > LEN_OPERAND:
+                err = OVERFLOW
+                res = res[-LEN_OPERAND:]
+                print_state("S8", kod, op1, op2, res, err)
+            else:
+                print_state("S6", kod, op1, op2, res, err)
+
         else:
             res = bin(int(op1, 2) // int(op2, 2))[2:]
             print_state("S7", kod, op1, op2, res, err)
-
-        if len(res) > LEN_OPERAND:
-            err = OVERFLOW
-            res = res[-LEN_OPERAND:]
-            print_state("S8", kod, op1, op2, res, err)
-
     print_state("S0", kod, op1, op2, res, err)
