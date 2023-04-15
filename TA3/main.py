@@ -83,6 +83,7 @@ class Expression:
 if __name__ == "__main__":
     e = Expression(input("Введите выражение, где элементы отделены пробелом: "))
 
+
     if not(e.CORRECT_SYNTAX):
         quit("Ошибка: выражение введено некорректно.")
     elif not(e.CORRECT_OPERANDS):
