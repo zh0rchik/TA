@@ -1,10 +1,7 @@
 class Expression:
     expression = ""
-    flag = True
     CORRECT_SYNTAX = True
     CORRECT_OPERANDS = True
-    CHECK_DIVISION_BY_ZERO = False
-    OVERFLOW = False
 
     def __init__(self, expression):
         self.expression = expression
@@ -17,8 +14,7 @@ class Expression:
         except ValueError:
             self.CORRECT_SYNTAX = False
 
-        return self.CORRECT_OPERANDS and self.CORRECT_SYNTAX \
-            and not(self.CHECK_DIVISION_BY_ZERO) and not(self.OVERFLOW)
+        return self.CORRECT_OPERANDS and self.CORRECT_SYNTAX
 
     def get_result(self):
         st = []
@@ -74,15 +70,15 @@ class Expression:
                     try:
                         st.append(op1 / op2)
                     except ZeroDivisionError:
-                        self.CHECK_DIVISION_BY_ZERO = True
+                        quit("Ошибка: попытка деления на 0.")
 
         try:
             result = st.pop()
         except IndexError:
             result = "Undefined"
 
-        if not (self.CHECK_DIVISION_BY_ZERO) and not (-32768 <= result <= 32767):
-            self.OVERFLOW = True
+        if not(-32768 <= result <= 32767):
+            quit("Ошибка: переполнение.")
 
         return result
 
@@ -93,10 +89,6 @@ if __name__ == "__main__":
         print(e.get_result())
         print(e.transform_record)
     elif not(e.CORRECT_SYNTAX):
-        print("Ошибка: выражение введено некорректно.")
+        quit("Ошибка: выражение введено некорректно.")
     elif not(e.CORRECT_OPERANDS):
-        print("Ошибка: в выражение могут быть числа с плавающей точкой, которые не меньше -32768 и не больше 32767.")
-    elif e.OVERFLOW:
-        print("Ошибка: переполнение.")
-    elif e.CHECK_DIVISION_BY_ZERO:
-        print("Ошибка: попытка деления на 0.")
+        quit("Ошибка: в выражение могут быть числа с плавающей точкой, которые не меньше -32768 и не больше 32767.")
