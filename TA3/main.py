@@ -1,11 +1,15 @@
 class Expression:
     expression = ""
+    flag = True
     CORRECT_SYNTAX = True
     CORRECT_OPERANDS = True
+    CHECK_DIVISION_BY_ZERO = False
+    OVERFLOW = False
 
     def __init__(self, expression):
         self.expression = expression
-        self.check_correct()
+        self.result = self.get_result()
+        self.flag = self.check_correct()
 
     def check_correct(self):
         try:
@@ -16,29 +20,32 @@ class Expression:
         except ValueError:
             self.CORRECT_SYNTAX = False
 
-    def get_transform_record(self):
+        return self.CORRECT_OPERANDS and self.CORRECT_SYNTAX \
+            and not(self.CHECK_DIVISION_BY_ZERO) and not(self.OVERFLOW)
+
+    def get_result(self):
         st = []
         units = []
 
         for unit in self.expression.split():
             if unit in ["+", "-"]:
-                if len(st) == 0 or st[len(st)-1] == "(":
+                if len(st) == 0 or st[len(st) - 1] == "(":
                     st.append(unit)
                 else:
-                    while len(st) != 0 and st[len(st)-1] in ["*", "/", "+", "-"]:
+                    while len(st) != 0 and st[len(st) - 1] in ["*", "/", "+", "-"]:
                         units.append(st.pop())
                     st.append(unit)
             elif unit in ["*", "/"]:
-                if len(st) == 0 or st[len(st)-1] in ["+", "-", "("]:
+                if len(st) == 0 or st[len(st) - 1] in ["+", "-", "("]:
                     st.append(unit)
                 else:
-                    while len(st) != 0 and st[len(st)-1] in ["*", "/"]:
+                    while len(st) != 0 and st[len(st) - 1] in ["*", "/"]:
                         units.append(st.pop())
                     st.append(unit)
             elif unit == "(":
                 st.append(unit)
             elif unit == ")":
-                while len(st) != 0 and st[len(st)-1] != "(":
+                while len(st) != 0 and st[len(st) - 1] != "(":
                     units.append(st.pop())
                 if len(st) != 0:
                     st.pop()
@@ -48,11 +55,9 @@ class Expression:
         while len(st) > 0:
             units.append(st.pop())
 
-        transform_record = " ".join(units)
-        return transform_record
+        self.transform_record = " ".join(units)
 
-    def get_result(self):
-        units = self.get_transform_record().split()
+        units = self.transform_record.split()
         st = []
 
         for unit in units:
@@ -72,22 +77,30 @@ class Expression:
                     try:
                         st.append(op1 / op2)
                     except ZeroDivisionError:
-                        quit("Ошибка: попытка деления на 0.")
+                        self.CHECK_DIVISION_BY_ZERO = True
 
-        result = st.pop()
-        if not (-32768 <= result <= 32767):
-            quit("Ошибка: переполнение.")
+        try:
+            result = st.pop()
+        except IndexError:
+            result = "Undefined"
+
+        if not (self.CHECK_DIVISION_BY_ZERO) and not (-32768 <= result <= 32767):
+            self.OVERFLOW = True
 
         return result
 
 if __name__ == "__main__":
-    e = Expression(input("Введите выражение, где элементы отделены пробелом: "))
+    print("Введите выражение, где элементы отделены пробелом: ")
+    e = Expression(input())
 
-
-    if not(e.CORRECT_SYNTAX):
-        quit("Ошибка: выражение введено некорректно.")
+    if e.flag:
+        print(e.result)
+        print(e.transform_record)
+    elif not(e.CORRECT_SYNTAX):
+        print("Ошибка: выражение введено некорректно.")
     elif not(e.CORRECT_OPERANDS):
-        quit("Ошибка: в выражение должны быть числа с плавающей точкой, которые не меньше -32768 и не больше 32767")
-    else:
-        print(e.get_result())
-        print(e.get_transform_record())
+        print("Ошибка: в выражение могут быть числа с плавающей точкой, которые не меньше -32768 и не больше 32767")
+    elif e.OVERFLOW:
+        print("Ошибка: переполнение.")
+    elif e.CHECK_DIVISION_BY_ZERO:
+        print("Ошибка: попытка деления на 0.")
