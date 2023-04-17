@@ -8,9 +8,6 @@ class Expression:
 
     def __init__(self, expression):
         self.expression = expression
-        self.result = self.get_result()
-        self.flag = self.check_correct()
-
     def check_correct(self):
         try:
             for number in self.expression.split():
@@ -90,16 +87,15 @@ class Expression:
         return result
 
 if __name__ == "__main__":
-    print("Введите выражение, где элементы отделены пробелом: ")
-    e = Expression(input())
+    e = Expression(input("Введите выражение, где элементы отделены пробелом: "))
 
-    if e.flag:
-        print(e.result)
+    if e.check_correct():
+        print(e.get_result())
         print(e.transform_record)
     elif not(e.CORRECT_SYNTAX):
         print("Ошибка: выражение введено некорректно.")
     elif not(e.CORRECT_OPERANDS):
-        print("Ошибка: в выражение могут быть числа с плавающей точкой, которые не меньше -32768 и не больше 32767")
+        print("Ошибка: в выражение могут быть числа с плавающей точкой, которые не меньше -32768 и не больше 32767.")
     elif e.OVERFLOW:
         print("Ошибка: переполнение.")
     elif e.CHECK_DIVISION_BY_ZERO:
