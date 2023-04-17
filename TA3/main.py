@@ -8,15 +8,15 @@ class Expression:
     def check_correct(self):
         try:
             for number in self.expression.split():
-                if number not in ["+", "-", "*", "/", "(", ")"]:
-                    if not (-32768 <= float(number) <= 32767):
+                if number not in ["+", "-", "*", "/", "(", ")"] \
+                        and not (-32768 <= float(number) <= 32767):
                         self.CORRECT_OPERANDS = False
         except ValueError:
             self.CORRECT_SYNTAX = False
 
         return self.CORRECT_OPERANDS and self.CORRECT_SYNTAX
 
-    def get_result(self):
+    def get_transform(self):
         st = []
         units = []
 
@@ -48,10 +48,13 @@ class Expression:
         while len(st) > 0:
             units.append(st.pop())
 
-        self.transform_record = " ".join(units)
+        transform_record = " ".join(units)
 
-        units = self.transform_record.split()
+        return transform_record
+
+    def get_result(self):
         st = []
+        units = self.get_transform().split()
 
         for unit in units:
             if unit not in ["+", "-", "*", "/", "(", ")"]:
@@ -72,10 +75,7 @@ class Expression:
                     except ZeroDivisionError:
                         quit("Ошибка: попытка деления на 0.")
 
-        try:
-            result = st.pop()
-        except IndexError:
-            result = "Undefined"
+        result = st.pop()
 
         if not(-32768 <= result <= 32767):
             quit("Ошибка: переполнение.")
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     if e.check_correct():
         print(e.get_result())
-        print(e.transform_record)
+        print(e.get_transform())
     elif not(e.CORRECT_SYNTAX):
         quit("Ошибка: выражение введено некорректно.")
     elif not(e.CORRECT_OPERANDS):
