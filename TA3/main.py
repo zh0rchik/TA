@@ -1,4 +1,6 @@
 class Expression:
+    str_state_cc = ""
+    str_state_gt = ""
     expression = ""
     CORRECT_SYNTAX = True
     CORRECT_OPERANDS = True
@@ -6,14 +8,20 @@ class Expression:
     def __init__(self, expression):
         self.expression = expression
     def check_correct(self):
+        self.str_state_cc += "check_out: S0 "
+        self.str_state_cc += "check_out: S1 "
         try:
             for number in self.expression.split():
                 if number not in ["+", "-", "*", "/", "(", ")"] \
                         and not (-32768 <= float(number) <= 32767):
                         self.CORRECT_OPERANDS = False
+                        self.str_state_cc += "check_out: S2 "
         except ValueError:
             self.CORRECT_SYNTAX = False
+            self.str_state_cc += "check_out: S3 "
 
+        self.str_state_cc += "check_out: S4 "
+        self.str_state_cc += "check_out: S0"
         return self.CORRECT_OPERANDS and self.CORRECT_SYNTAX
 
     def get_transform(self):
@@ -53,33 +61,50 @@ class Expression:
         return transform_record
 
     def get_result(self):
+        self.str_state_gt += "get_result: S0 "
         st = []
         units = self.get_transform().split()
+        self.str_state_gt += "get_result: S1 "
 
         for unit in units:
             if unit not in ["+", "-", "*", "/", "(", ")"]:
                 st.append(float(unit))
+                self.str_state_gt += "get_result: S2 "
             else:
                 op2 = st.pop()
                 op1 = st.pop()
+                self.str_state_gt += "get_result: S3 "
 
                 if unit == "+":
                     st.append(op1 + op2)
+                    self.str_state_gt += "get_result: S4 "
                 elif unit == "-":
                     st.append(op1 - op2)
+                    self.str_state_gt += "get_result: S5 "
                 elif unit == "*":
                     st.append(op1 * op2)
+                    self.str_state_gt += "get_result: S6 "
                 elif unit == "/":
                     try:
                         st.append(op1 / op2)
+                        self.str_state_gt += "get_result: S7 "
                     except ZeroDivisionError:
+                        self.str_state_gt += "get_result: S10 "
+                        self.str_state_gt += "get_result: S0"
+                        print(self.str_state_gt)
                         quit("Ошибка: попытка деления на 0.")
 
         result = st.pop()
+        self.str_state_gt += "get_result: S8 "
 
         if not(-32768 <= result <= 32767):
+            self.str_state_gt += "get_result: S9 "
+            self.str_state_gt += "get_result: S0"
+            print(self.str_state_gt)
             quit("Ошибка: переполнение.")
 
+        self.str_state_gt += "get_result: S11 "
+        self.str_state_gt += "get_result: S0"
         return result
 
 if __name__ == "__main__":
@@ -89,6 +114,9 @@ if __name__ == "__main__":
         print(e.get_result())
         print(e.get_transform())
     elif not(e.CORRECT_SYNTAX):
-        quit("Ошибка: выражение введено некорректно.")
+        print("Ошибка: выражение введено некорректно.")
     elif not(e.CORRECT_OPERANDS):
-        quit("Ошибка: в выражение могут быть числа с плавающей точкой, которые не меньше -32768 и не больше 32767.")
+        print("Ошибка: в выражение могут быть числа с плавающей точкой, которые не меньше -32768 и не больше 32767.")
+
+    print(e.str_state_cc)
+    print(e.str_state_gt)
